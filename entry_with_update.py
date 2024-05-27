@@ -1,5 +1,21 @@
 import os
 import sys
+from datetime import datetime
+
+
+# Set the output directory in your Google Drive
+output_dir = "/content/drive/MyDrive/Fooocus/output_images"
+
+# Create the output directory if it doesn't exist
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+# Generate the timestamped filename
+timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+filename = f"{prompt.replace(' ', '_')}_{timestamp}.png"
+
+# Save the image to the output directory
+image.save(os.path.join(output_dir, filename))
 
 
 root = os.path.dirname(os.path.abspath(__file__))
