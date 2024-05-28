@@ -1,27 +1,34 @@
 import os
 import sys
 from datetime import datetime
+import gradio as gr
 
+def save_image(image, prompt):
+    # Set the output directory in your Google Drive
+    output_dir = "/content/drive/MyDrive/Fooocus/output_images"
 
-# Set the output directory in your Google Drive
-output_dir = "/content/drive/MyDrive/Fooocus/output_images"
+    # Create the output directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-# Create the output directory if it doesn't exist
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+    # Generate the timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    filename = f"{prompt.replace(' ', '_')}_{timestamp}.png"
 
-# Generate the timestamped filename
-timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-filename = f"{prompt.replace(' ', '_')}_{timestamp}.png"
+    # Save the image to the output directory
+    image.save(os.path.join(output_dir, filename))
+    return image
 
-# Save the image to the output directory
-image.save(os.path.join(output_dir, filename))
+def update_output(output_component, image, prompt):
+    output_component.update(value=save_image(image, prompt))
 
+def entry_with_update(prompt, steps, guidance_scale, seed, width=512, height=512):
+    image = pipe(prompt, num_inference_steps=steps, guidance_scale=guidance_scale, generator=torch.Generator("cuda").manual_seed(seed), width=width, height=height).images[0]
+    return gr.update(visible=True), image, prompt
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(root)
 os.chdir(root)
-
 
 try:
     import pygit2
